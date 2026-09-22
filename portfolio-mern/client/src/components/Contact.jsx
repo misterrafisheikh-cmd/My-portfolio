@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useReveal } from "../hooks/useReveal.js";
-import { contactLinks, contactEmail } from "../data/links.js";
+import { useContent } from "../context/ContentContext.jsx";
 import { sendContactMessage } from "../lib/api.js";
 import { toast } from "./Toast.jsx";
 import SectionHead from "./SectionHead.jsx";
@@ -8,6 +8,7 @@ import SectionHead from "./SectionHead.jsx";
 const initial = { name: "", email: "", message: "" };
 
 export default function Contact() {
+  const { links } = useContent();
   const headRef = useReveal();
   const formRef = useReveal();
   const linksRef = useReveal();
@@ -64,7 +65,7 @@ export default function Contact() {
           <form ref={formRef} onSubmit={submit} noValidate className="rv grid gap-4">
             <div className="grid gap-[7px]">
               <label htmlFor="name" className="text-[0.8rem]" style={{ color: "var(--faint)" }}>Your name</label>
-              <input id="name" name="name" value={values.name} onChange={change} autoComplete="name" placeholder="Rafi Sheikh"
+              <input id="name" name="name" value={values.name} onChange={change} autoComplete="name" placeholder="Ayesha Rahman"
                 className={field} style={{ borderColor: "var(--line)", background: "var(--panel)" }} />
               <p className="min-h-[1em] text-[0.76rem]" style={{ color: "var(--phase)" }}>{errors.name}</p>
             </div>
@@ -90,7 +91,7 @@ export default function Contact() {
           <div ref={linksRef} className="rv">
             <p className="mt-0" style={{ color: "var(--muted)" }}>Prefer something direct? Every line below copies to your clipboard.</p>
             <div className="mt-6 grid gap-3">
-              {contactLinks.map((l) => (
+              {links.contact.map((l) => (
                 <button key={l.copy} onClick={() => copy(l.copy)}
                   className="flex w-full items-center justify-between gap-4 rounded-xl border px-5 py-4 text-left transition-all hover:translate-x-1"
                   style={{ borderColor: "var(--line)", background: "var(--panel)" }}>

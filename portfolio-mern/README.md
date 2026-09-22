@@ -51,16 +51,56 @@ If you don't want to set up MongoDB right now, the site still works —
 only the contact form's "Send" button will show an error until the backend
 is reachable.
 
-## Editing content (no code structure changes needed)
+## Admin dashboard
+
+The site has two admin-only pages: **Messages** (`/admin`) and **Edit content**
+(`/admin/content`). Log in once at `/admin/login` and both are unlocked.
+
+**Set it up:** in `server/.env`, set `ADMIN_PASSWORD` (whatever you want to
+log in with) and `JWT_SECRET` (any long random string — it signs your login
+session, it isn't something you type in).
+
+**Messages** — every contact-form submission lands here. Mark as read/unread,
+delete, filter to unread only.
+
+**Edit content** — this is the CMS half. Every piece of text on the site —
+the hero name and tagline, the About paragraphs and stats, all three skill
+groups and their percentage bars, every project card, the career timeline,
+and the contact links — is stored in MongoDB and editable from tabs here.
+Change something, click **Save changes**, refresh the live site — done. No
+code, no redeploy, no touching `client/src/data/`.
+
+There's also a **Sections** tab: add a free-form block (title + text +
+an optional bullet list) and it appears on the homepage between Projects
+and Contact automatically. This is the closest a database-driven page can
+get to "add a new component" without a developer — it reuses one flexible
+layout, so it's right for things like a "Services" or "Testimonials" block.
+A genuinely new custom-designed piece of the page (its own animation, its
+own layout) still means writing a new component the way this whole site
+was built — see "Adding a new section or component" below.
+
+This is intentionally simple: one password, one admin. If you ever need
+multiple admin accounts, replace the check in
+`server/controllers/auth.controller.js` with a real `User` model.
+
+**Deploying with client-side routing:** because `/admin` and `/admin/content`
+are React Router routes, not real folders on the server, your static host
+needs to serve `index.html` for unknown paths. Netlify: add a
+`client/public/_redirects` file containing `/*  /index.html  200`. Vercel:
+add a `vercel.json` with a rewrite from `/(.*)` to `/index.html`. (Vite's
+own dev server does this automatically, so you won't notice anything
+missing until you deploy.)
+
+## Editing content
+
+Almost everything is edited from `/admin/content` now (see above) — you
+shouldn't need to touch code for text changes. The exceptions:
 
 | What you want to change      | File                                |
 |-------------------------------|--------------------------------------|
-| Projects                      | `client/src/data/projects.js`       |
-| Skills / proficiency bars      | `client/src/data/skills.js`         |
-| Career timeline                | `client/src/data/timeline.js`       |
-| Email / social links           | `client/src/data/links.js`          |
+| Nav menu labels/links          | `client/src/data/links.js`          |
 | Colors, fonts                  | `client/src/index.css` (`:root`)    |
-| Hero name, tagline, roles      | `client/src/components/Hero.jsx`    |
+| "Open to work · Dhaka, BD" badge, section headings/blurbs | the relevant component in `client/src/components/` |
 
 ## Adding a new section or component
 
@@ -92,6 +132,8 @@ Typical free-tier setup: deploy `client/dist` to Vercel/Netlify, deploy
 PORT=5000
 MONGO_URI=your-mongodb-connection-string
 CLIENT_ORIGIN=http://localhost:5173
+ADMIN_PASSWORD=your-dashboard-password
+JWT_SECRET=a-long-random-string
 # optional — only needed if you want email notifications on new messages
 SMTP_HOST=
 SMTP_PORT=

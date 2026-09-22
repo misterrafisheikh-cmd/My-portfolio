@@ -1,20 +1,14 @@
 import { useEffect, useState } from "react";
 import FourierCanvas from "./FourierCanvas.jsx";
 import { useTypedText } from "../hooks/useTypedText.js";
+import { useContent } from "../context/ContentContext.jsx";
 import { toast } from "./Toast.jsx";
 
-
-
-const ROLES = ["full-stack engineer", "interface builder", "systems tinkerer", "problem chaser"];
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#$%&@*+=<>/\\|";
-const NAME = "Rafi Sheikh";
-const LEDE =
-  "I build web software the way a signal gets cleaned up: strip the noise, keep the shape, make every layer do one job well. Front-end that feels instant, back-end that holds under load.";
-const CIPHER_NAME = "K9XQ VF2MTP";
-const CIPHER_LEDE = "Payload sealed. AES-256-GCM, key held client-side. Press decrypt to restore the plaintext.";
 
-function useScramble(finalText) {
-  const [text, setText] = useState(finalText);
+function useScramble(value) {
+  const [text, setText] = useState(value);
+  useEffect(() => setText(value), [value]);
   const run = (target, dur = 900) => {
     const len = Math.max(target.length, text.length);
     const start = performance.now();
@@ -51,22 +45,23 @@ function useHarmonics() {
 }
 
 export default function Hero() {
-  const role = useTypedText(ROLES);
+  const { hero } = useContent();
+  const role = useTypedText(hero.roles);
   const harmonics = useHarmonics();
   const [encrypted, setEncrypted] = useState(false);
-  const [nameText, scrambleName] = useScramble(NAME);
-  const [ledeText, scrambleLede] = useScramble(LEDE);
+  const [nameText, scrambleName] = useScramble(hero.name);
+  const [ledeText, scrambleLede] = useScramble(hero.lede);
 
   const handleEncrypt = () => {
     const next = !encrypted;
     setEncrypted(next);
     if (next) {
-      scrambleName(CIPHER_NAME, 900);
-      scrambleLede(CIPHER_LEDE, 1100);
+      scrambleName(hero.cipherName, 900);
+      scrambleLede(hero.cipherLede, 1100);
       toast("Encrypted — nothing left the browser.");
     } else {
-      scrambleName(NAME, 900);
-      scrambleLede(LEDE, 1100);
+      scrambleName(hero.name, 900);
+      scrambleLede(hero.lede, 1100);
       toast("Decrypted.");
     }
   };
@@ -131,7 +126,6 @@ export default function Hero() {
             <span>sample rate <b style={{ color: "var(--signal)", fontWeight: 500 }}>60 Hz</b></span>
             <span>build <b style={{ color: "var(--signal)", fontWeight: 500 }}>v2.6.0</b></span>
             <span>status <b style={{ color: "var(--signal)", fontWeight: 500 }}>listening</b></span>
-             
           </div>
         </div>
       </div>

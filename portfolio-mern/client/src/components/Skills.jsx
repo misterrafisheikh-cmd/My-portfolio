@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useReveal } from "../hooks/useReveal.js";
-import { skillGroups, marqueeItems } from "../data/skills.js";
+import { useContent } from "../context/ContentContext.jsx";
 import SectionHead from "./SectionHead.jsx";
 
 function Meter({ name, level, pct, groupInView }) {
@@ -35,7 +35,7 @@ function SkillCard({ group }) {
     <div ref={ref} className="rv panel p-6">
       <h3 className="m-0 mb-1 text-[1.06rem] font-semibold tracking-[-.02em]">{group.title}</h3>
       <p className="mb-[22px] font-mono text-[0.84rem]" style={{ color: "var(--faint)" }}>{group.subtitle}</p>
-      {group.skills.map((s) => (
+      {group.items.map((s) => (
         <Meter key={s.name} {...s} groupInView={inView} />
       ))}
     </div>
@@ -43,9 +43,10 @@ function SkillCard({ group }) {
 }
 
 export default function Skills() {
+  const { skills } = useContent();
   const headRef = useReveal();
   const mqRef = useReveal();
-  const items = [...marqueeItems, ...marqueeItems];
+  const items = [...skills.marquee, ...skills.marquee];
 
   return (
     <section id="skills" className="py-[110px]">
@@ -57,7 +58,7 @@ export default function Skills() {
           blurb="Depth where it counts, working knowledge everywhere else. No tool listed here is one I've only read about."
         />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {skillGroups.map((g) => <SkillCard key={g.title} group={g} />)}
+          {skills.groups.map((g) => <SkillCard key={g.title} group={g} />)}
         </div>
 
         <div

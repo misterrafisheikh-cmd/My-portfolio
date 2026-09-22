@@ -1,5 +1,5 @@
 import { useReveal } from "../hooks/useReveal.js";
-import { timeline } from "../data/timeline.js";
+import { useContent } from "../context/ContentContext.jsx";
 
 function Row({ item }) {
   const ref = useReveal();
@@ -15,6 +15,7 @@ function Row({ item }) {
 }
 
 export default function Timeline() {
+  const { timeline } = useContent();
   return (
     <div className="mt-[70px]">
       {timeline.map((item, i) => <Row key={i} item={item} />)}

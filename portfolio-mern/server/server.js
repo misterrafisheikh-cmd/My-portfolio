@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import { connectDB } from "./config/db.js";
 import contactRoutes from "./routes/contact.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import contentRoutes from "./routes/content.routes.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -21,11 +23,19 @@ const contactLimiter = rateLimit({
   message: { error: "Too many messages sent — try again in a bit." },
 });
 
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: "Too many attempts — try again in a bit." },
+});
+
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 // Add new feature routes the same way: create routes/<name>.routes.js
 // and mount it here, e.g. app.use("/api/newsletter", newsletterRoutes)
 app.use("/api/contact", contactLimiter, contactRoutes);
+app.use("/api/admin", loginLimiter, authRoutes);
+app.use("/api/content", contentRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

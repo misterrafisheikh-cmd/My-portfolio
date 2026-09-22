@@ -1,13 +1,15 @@
 import { Router } from "express";
-import { createMessage, listMessages } from "../controllers/contact.controller.js";
+import { createMessage, listMessages, markRead, deleteMessage } from "../controllers/contact.controller.js";
+import { requireAdmin } from "../middleware/auth.js";
 
 const router = Router();
 
-// POST /api/contact        — the public form on the site
+// POST /api/contact         — the public form on the site (no auth)
 router.post("/", createMessage);
 
-// GET  /api/contact         — for your own use (an admin page, Postman, etc.)
-// Add real auth here before shipping this route publicly.
-router.get("/", listMessages);
+// Everything below is the admin dashboard's API — token required.
+router.get("/", requireAdmin, listMessages);
+router.patch("/:id/read", requireAdmin, markRead);
+router.delete("/:id", requireAdmin, deleteMessage);
 
 export default router;

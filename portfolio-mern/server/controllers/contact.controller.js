@@ -22,7 +22,6 @@ export async function createMessage(req, res, next) {
       message: message.trim(),
     });
 
-    // Fire-and-forget — a failed notification email should never fail the request.
     sendNotification(saved).catch((e) => console.error("Email notify failed:", e.message));
 
     res.status(201).json({ ok: true, id: saved._id });
@@ -31,10 +30,36 @@ export async function createMessage(req, res, next) {
   }
 }
 
+// --- everything below is admin-only (see routes/contact.routes.js) ---
+
 export async function listMessages(req, res, next) {
   try {
-    const messages = await Message.find().sort({ createdAt: -1 }).limit(200);
+    const messages = await Message.find().sort({ createdAt: -1 }).limit(500);
     res.json(messages);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function markRead(req, res, next) {
+  try {
+    const updated = await Message.findByIdAndUpdate(
+      req.params.id,
+      { read: req.body?.read !== false },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: "Message not found." });
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteMessage(req, res, next) {
+  try {
+    const deleted = await Message.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Message not found." });
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }

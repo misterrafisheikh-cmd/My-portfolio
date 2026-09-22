@@ -1,11 +1,20 @@
 import { useState } from "react";
 import { useReveal } from "../hooks/useReveal.js";
-import { projects, filters } from "../data/projects.js";
+import { useContent } from "../context/ContentContext.jsx";
 import ProjectCard from "./ProjectCard.jsx";
 import Timeline from "./Timeline.jsx";
+import ExtraSections from "./ExtraSections.jsx";
 import SectionHead from "./SectionHead.jsx";
 
+const filters = [
+  { key: "all", label: "Everything" },
+  { key: "web", label: "Web apps" },
+  { key: "tool", label: "Tools" },
+  { key: "lab", label: "Experiments" },
+];
+
 export default function Projects() {
+  const { projects } = useContent();
   const headRef = useReveal();
   const [active, setActive] = useState("all");
 
@@ -45,6 +54,7 @@ export default function Projects() {
 
         <Timeline />
       </div>
+      <ExtraSections />
     </section>
   );
 }
