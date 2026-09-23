@@ -116,7 +116,7 @@ const contentSchema = new mongoose.Schema(
     links: {
       email: { type: String, default: "rafi.sheikh@example.com" },
       contact: {
-        type: [{ label: String, type: String, copy: String }],
+        type: [{ label: String, type: { type: String }, copy: String }],
         default: [
           { label: "rafi.sheikh@example.com", type: "Email", copy: "rafi.sheikh@example.com" },
           { label: "github.com/rafisheikh", type: "Code", copy: "github.com/rafisheikh" },

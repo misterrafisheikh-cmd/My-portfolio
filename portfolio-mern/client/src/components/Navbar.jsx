@@ -48,7 +48,7 @@ export default function Navbar() {
             scrolled ? "py-2.5" : "py-4"
           }`}
         >
-          <a href="#home" className="mr-3.5 whitespace-nowrap text-[1.02rem] font-bold tracking-tight">
+          <a href="#home" className="mr-0.4 whitespace-nowrap text-[1.02rem] font-bold tracking-tight">
             Rafi Sheikh{" "}
             <span className="font-mono" style={{ color: "var(--blue)" }}>
               "<i className="animate-blink not-italic">_</i>"
@@ -56,7 +56,7 @@ export default function Navbar() {
           </a>
 
           <nav
-            className={`flex items-center gap-0.5 max-md:absolute max-md:left-0 max-md:right-0 max-md:top-[calc(100%+10px)] max-md:flex-col max-md:items-stretch max-md:gap-0.5 max-md:rounded-[20px] max-md:border max-md:p-2.5 max-md:shadow-[var(--shadow)] max-md:transition-all max-md:duration-200 ${
+            className={`flex items-center gap-0.5 max-md:absolute max-md:left-0 max-md:right-0 max-md:top-[calc(100%)+10px] max-md:flex-col max-md:items-stretch max-md:gap-0.5 max-md:rounded-[20px] max-md:border max-md:p-2.5 max-md:shadow-[var(--shadow)] max-md:transition-all max-md:duration-200 ${
               open ? "max-md:pointer-events-auto max-md:opacity-100" : "max-md:pointer-events-none max-md:-translate-y-2 max-md:opacity-0"
             }`}
             style={{ borderColor: "var(--line)", background: "var(--panel-solid)" }}
