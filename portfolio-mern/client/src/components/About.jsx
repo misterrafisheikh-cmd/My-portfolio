@@ -1,3 +1,9 @@
+// ============================================================
+// About — the "01 — About" section: photo/identity card on the left,
+// bio paragraphs and the three animated stat counters on the right.
+// All the text and numbers come from the database (useContent), edited
+// from /admin/content's "About" tab — nothing here is hardcoded text.
+// ============================================================
 import { useEffect, useState } from "react";
 import { useReveal } from "../hooks/useReveal.js";
 import { useCountUp } from "../hooks/useCountUp.js";
@@ -41,9 +47,13 @@ export default function About() {
         />
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[0.85fr_1.15fr] md:gap-14">
           <div ref={cardRef} className="rv panel relative overflow-hidden p-6">
-            <div className="aspect-square grid place-items-center rounded-[10px] border text-[clamp(3rem,9vw,4.4rem)] font-bold tracking-[-.06em]"
+            <div className="aspect-square overflow-hidden rounded-[10px] border grid place-items-center text-[clamp(3rem,9vw,4.4rem)] font-bold tracking-[-.06em]"
               style={{ borderColor: "var(--line)", background: "radial-gradient(circle at 30% 25%, var(--blue-soft), transparent 60%), linear-gradient(160deg, rgba(120,158,224,.12), transparent)" }}>
-              {initials}
+              {about.avatarUrl ? (
+                <img src={about.avatarUrl} alt={hero.name} className="h-full w-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <dl className="mt-[22px] grid gap-3 font-mono text-[0.86rem]">
               {about.identity.map(({ label, value }) => (

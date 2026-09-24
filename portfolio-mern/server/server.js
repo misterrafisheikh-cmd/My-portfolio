@@ -1,3 +1,10 @@
+// ============================================================
+// server.js — the entry point. This is the file that actually starts
+// the backend: sets up Express, connects to MongoDB, and mounts every
+// route group (contact form, admin login, content). To add a whole
+// new feature's API, create routes/yourthing.routes.js and mount it
+// here the same way the others are mounted below.
+// ============================================================
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -14,7 +21,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || "http://localhost:5173" }));
-app.use(express.json({ limit: "50kb" }));
+// The default 50kb limit is fine for the contact form, but a profile
+// photo saved as a base64 data URL (see AdminContent.jsx) can run to a
+// few hundred KB or more, so the content-save endpoint needs headroom.
+app.use(express.json({ limit: "8mb" }));
 
 // Basic abuse guard on the public contact endpoint.
 const contactLimiter = rateLimit({

@@ -1,3 +1,9 @@
+// ============================================================
+// App — the top of the whole React app. Sets up the router (which URL
+// shows which page) and wraps everything in AdminAuthProvider so the
+// admin login state is available everywhere. This file rarely needs
+// editing unless you're adding a whole new page/route.
+// ============================================================
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AdminAuthProvider } from "./context/AdminAuthContext.jsx";
 import RequireAdminAuth from "./components/RequireAdminAuth.jsx";

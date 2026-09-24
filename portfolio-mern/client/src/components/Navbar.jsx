@@ -1,19 +1,35 @@
+// ============================================================
+// Navbar — the sticky bar at the top of the site.
+// What it does, in order:
+//  1. Builds the list of nav links (fixed ones + one per admin-added
+//     "Section" from the dashboard).
+//  2. Watches scroll position to know which section is "active" (for
+//     the underline) and whether to shrink the bar.
+//  3. Renders the bar itself: logo, links, clock, theme toggle,
+//     mobile menu button, "Hire Me" button, and the animated sea-wave
+//     edge at the bottom (Rain.jsx uses that wave's position to know
+//     where to start falling from).
+// ============================================================
 import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useScrollProgress } from "../hooks/useScrollProgress.js";
 import { useContent } from "../context/ContentContext.jsx";
 import { navLinks as staticLinks } from "../data/links.js";
+import Clock from "./Clock.jsx";
 
 export default function Navbar() {
-  const { theme, toggle } = useTheme();
-  const { scrolled } = useScrollProgress();
-  const { extraSections } = useContent();
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("home");
+  const { theme, toggle } = useTheme();           // dark/light mode + the function to flip it
+  const { scrolled } = useScrollProgress();        // true once the page has scrolled a bit (shrinks the bar)
+  const { extraSections } = useContent();          // any sections the admin added from the dashboard
+  const [open, setOpen] = useState(false);         // is the mobile dropdown menu open?
+  const [active, setActive] = useState("home");    // which section id is currently in view
 
-  // Static links (Home/About/Skills/Projects/Contact) plus one per
-  // admin-added section, inserted right before Contact to match the
-  // order they render on the page (see pages/Home.jsx).
+  // Build the final link list: the fixed ones (Home/About/Skills/
+  // Projects/Contact) from data/links.js, plus one extra link for
+  // every admin-added section — inserted right before Contact so the
+  // nav order matches the order sections actually appear on the page
+  // (see pages/Home.jsx). useMemo just means "only recalculate this
+  // when extraSections actually changes", not on every render.
   const navLinks = useMemo(() => {
     const links = [...staticLinks];
     const contactIndex = links.findIndex((l) => l.href === "#contact");
@@ -22,6 +38,10 @@ export default function Navbar() {
     return links;
   }, [extraSections]);
 
+  // Scroll-spy: every scroll event, check which section's top has
+  // passed a point near the top of the screen, and mark that link
+  // "active" (gives it the underline). Re-runs if navLinks changes,
+  // e.g. once admin-added sections finish loading.
   useEffect(() => {
     const sections = navLinks.map((l) => document.getElementById(l.href.slice(1))).filter(Boolean);
     const onScroll = () => {
@@ -38,14 +58,15 @@ export default function Navbar() {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[80]">
+      {/* The "sea" band — a gradient background plus a drifting light-streak layer */}
       <div
         className="relative shadow-[0_16px_40px_-28px_rgba(0,0,0,0.8)]"
         style={{
-          paddingTop: "env(safe-area-inset-top, 0px)",
+          paddingTop: "env(safe-area-inset-top, 0px)", // keeps content clear of a phone's notch/status bar
           background: "linear-gradient(180deg, var(--sea-deep) 0%, var(--sea-mid) 58%, var(--sea-fore) 100%)",
         }}
       >
-        {/* drifting light streaks inside the water body */}
+        {/* drifting light streaks inside the water body — purely decorative */}
         <div
           aria-hidden="true"
           className="absolute inset-0 animate-current"
@@ -56,11 +77,13 @@ export default function Navbar() {
           }}
         />
 
+        {/* The actual bar: logo — links — clock/theme/menu/hire-me */}
         <div
           className={`relative z-[2] mx-auto flex w-[min(1180px,100%-44px)] items-center gap-1.5 transition-[padding] duration-300 ${
             scrolled ? "py-2.5" : "py-4"
           }`}
         >
+          {/* Site name / logo — jumps to the top of the page */}
           <a href="#home" className="mr-3.5 whitespace-nowrap text-[1.02rem] font-bold tracking-tight">
             Rafi Sheikh{" "}
             <span className="font-mono" style={{ color: "var(--blue)" }}>
@@ -68,6 +91,8 @@ export default function Navbar() {
             </span>
           </a>
 
+          {/* Nav links. On phones this becomes a dropdown (see the max-md: classes)
+              that opens below the bar when the hamburger button is tapped. */}
           <nav
             className={`flex items-center gap-0.5 max-md:absolute max-md:left-0 max-md:right-0 max-md:top-[calc(100%+10px)] max-md:flex-col max-md:items-stretch max-md:gap-0.5 max-md:rounded-[20px] max-md:border max-md:p-2.5 max-md:shadow-[var(--shadow)] max-md:transition-all max-md:duration-200 ${
               open ? "max-md:pointer-events-auto max-md:opacity-100" : "max-md:pointer-events-none max-md:-translate-y-2 max-md:opacity-0"
@@ -78,7 +103,7 @@ export default function Navbar() {
               <a
                 key={l.href}
                 href={l.href}
-                onClick={() => setOpen(false)}
+                onClick={() => setOpen(false)} // closes the mobile dropdown after tapping a link
                 className="relative rounded-full px-3.5 py-2 text-[0.925rem] transition-colors"
                 style={{ color: active === l.href.slice(1) ? "var(--text)" : "var(--muted)" }}
               >
@@ -93,7 +118,10 @@ export default function Navbar() {
             ))}
           </nav>
 
-          <div className="ml-2 flex items-center gap-2">
+          {/* Right-hand cluster: live clock, dark/light toggle, mobile menu button, Hire Me */}
+          <div className="ml-2 flex items-center gap-3">
+            <Clock />
+
             <button
               onClick={toggle}
               aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
@@ -105,6 +133,9 @@ export default function Navbar() {
                 <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
               </svg>
             </button>
+
+            {/* Hamburger — only visible on phones (md:hidden is on the nav's mobile
+                classes above; this button itself is hidden on desktop via CSS below) */}
             <button
               onClick={() => setOpen((o) => !o)}
               aria-label="Open menu"
@@ -116,6 +147,7 @@ export default function Navbar() {
                 <path d="M4 7h16M4 12h16M4 17h16" />
               </svg>
             </button>
+
             <a
               href="#contact"
               className="whitespace-nowrap rounded-full px-5 py-2.5 text-[0.93rem] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(47,107,255,.85)] transition-transform hover:-translate-y-0.5 max-md:hidden"
@@ -126,7 +158,9 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* animated sea-wave edge — Rain.jsx measures data-wave-edge to know where drops start */}
+        {/* The animated sea-wave edge at the bottom of the bar.
+            data-wave-edge is how Rain.jsx finds this element's position,
+            so its raindrops start falling from exactly here. */}
         <div data-wave-edge className="pointer-events-none absolute left-0 right-0 top-full h-14 animate-swell overflow-hidden">
           <svg viewBox="0 0 1440 56" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
             <path

@@ -19,6 +19,7 @@ const contentSchema = new mongoose.Schema(
     },
     about: {
       blurb: { type: String, default: "Five years of shipping products that people actually open on a Monday morning." },
+      avatarUrl: { type: String, default: "" },
       identity: {
         type: [{ label: String, value: String }],
         default: [
@@ -125,7 +126,17 @@ const contentSchema = new mongoose.Schema(
         ],
       },
     },
-    // Free-form sections the admin can add without any code change —
+    // Site-wide accent colors. These three are used all over the page —
+    // buttons/links (accent), the little pulsing "open to work" dot and
+    // skill-bar gradients (signal), and highlights like the active nav
+    // underline (phase). Changing them here changes the whole site's
+    // look without touching any component file. See client's
+    // ThemeVars.jsx, which applies these as CSS variables at runtime.
+    theme: {
+      accent: { type: String, default: "#4f8dff" },
+      signal: { type: String, default: "#3ddc84" },
+      phase: { type: String, default: "#ff9a3c" },
+    },
     // rendered on the homepage, in order, between Projects and Contact.
     // `layout` picks how it's drawn: "text" (a paragraph + bullet list,
     // like About), "cards" (a grid of items, optionally linking out),

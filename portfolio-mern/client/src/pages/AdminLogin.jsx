@@ -1,3 +1,8 @@
+// ============================================================
+// AdminLogin — the password screen at /admin/login. On success it
+// stores a login token (see context/AdminAuthContext.jsx) and sends
+// you to the Messages dashboard.
+// ============================================================
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext.jsx";

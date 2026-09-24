@@ -1,3 +1,9 @@
+// ============================================================
+// Message.js — the shape of one contact-form submission as stored in
+// MongoDB: name, email, message text, and whether it's been marked
+// read in the admin dashboard. `timestamps: true` automatically adds
+// createdAt/updatedAt fields.
+// ============================================================
 import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(

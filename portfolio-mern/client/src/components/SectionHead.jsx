@@ -1,3 +1,10 @@
+// ============================================================
+// SectionHead — the "01 — About", heading, and optional description
+// row used at the top of every section. One shared component so every
+// section's heading looks and behaves the same; pass either a
+// `blurb` string or a custom `right` element (Projects uses `right`
+// for its filter chips instead of a plain blurb).
+// ============================================================
 // Shared heading block used by every section — pass the eyebrow number/
 // label, the heading, and either children or a `blurb` string on the right.
 export default function SectionHead({ tag, title, blurb, right, revealRef }) {

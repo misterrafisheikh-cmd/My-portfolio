@@ -1,3 +1,10 @@
+// ============================================================
+// contact.controller.js — the logic behind the contact form and the
+// admin Messages dashboard. createMessage runs when a visitor submits
+// the site's contact form (no login needed). listMessages, markRead,
+// and deleteMessage all require an admin login token — see
+// middleware/auth.js and routes/contact.routes.js.
+// ============================================================
 import Message from "../models/Message.js";
 import { sendNotification } from "../lib/mailer.js";
 

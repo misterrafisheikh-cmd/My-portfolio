@@ -1,3 +1,9 @@
+// ============================================================
+// auth.controller.js — the admin login check. There's only one admin
+// account here (the ADMIN_PASSWORD in server/.env, or on Render's
+// Environment tab for the live site) — this isn't a full user system,
+// just a single password gate for the dashboard.
+// ============================================================
 import jwt from "jsonwebtoken";
 
 // Single hardcoded admin — this is a personal portfolio, not a multi-user

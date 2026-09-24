@@ -1,3 +1,10 @@
+// ============================================================
+// Toast — the little pill notification that slides up from the
+// bottom of the screen ("Message sent", "Copied ...", etc). Any part
+// of the app can trigger one by calling toast("some text") — it fires
+// a browser event that this component is always listening for, so you
+// never need to pass a toast function around as a prop.
+// ============================================================
 import { useEffect, useState } from "react";
 
 // Fires window "toast" events from anywhere: window.dispatchEvent(new

@@ -1,3 +1,7 @@
+// ============================================================
+// auth.routes.js — the single login endpoint the admin dashboard's
+// login page calls.
+// ============================================================
 import { Router } from "express";
 import { login } from "../controllers/auth.controller.js";
 

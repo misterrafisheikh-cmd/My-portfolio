@@ -1,3 +1,9 @@
+// ============================================================
+// Contact — the "04 — Contact" section: a form on the left (which
+// POSTs to the backend's /api/contact and lands in the admin
+// Messages dashboard), and a list of copy-to-clipboard contact links
+// on the right, both driven by the database (useContent).
+// ============================================================
 import { useState } from "react";
 import { useReveal } from "../hooks/useReveal.js";
 import { useContent } from "../context/ContentContext.jsx";

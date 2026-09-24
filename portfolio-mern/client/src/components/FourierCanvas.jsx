@@ -1,3 +1,11 @@
+// ============================================================
+// FourierCanvas — the animated drawing behind the Hero text: spinning
+// circles (epicycles) whose combined motion traces out a square wave,
+// which is what a Fourier series actually is. `harmonics` (how many
+// circles to draw, 2–7) is controlled by Hero.jsx based on how far the
+// visitor has scrolled past the hero. Runs on its own <canvas> with
+// requestAnimationFrame — this is plain Canvas 2D drawing, not an image.
+// ============================================================
 import { useEffect, useRef } from "react";
 
 // The hero's square-wave-from-epicycles animation. `harmonics` (2–7) is

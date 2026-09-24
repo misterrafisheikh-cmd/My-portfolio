@@ -1,3 +1,9 @@
+// ============================================================
+// Timeline — the career-history rows under the Projects grid. Reads
+// the "timeline" array from the database (edited in /admin/content's
+// "Timeline" tab) and renders one row per entry, each fading in as it
+// scrolls into view.
+// ============================================================
 import { useReveal } from "../hooks/useReveal.js";
 import { useContent } from "../context/ContentContext.jsx";
 

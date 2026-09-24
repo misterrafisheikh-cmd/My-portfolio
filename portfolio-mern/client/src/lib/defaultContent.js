@@ -14,6 +14,7 @@ export const defaultContent = {
   },
   about: {
     blurb: "Five years of shipping products that people actually open on a Monday morning.",
+    avatarUrl: "",
     identity: [
       { label: "Based in", value: "Dhaka, Bangladesh" },
       { label: "Focus", value: "Full-stack · Web" },
@@ -67,6 +68,7 @@ export const defaultContent = {
     { range: "2022 — 2024", role: "Full-stack Developer · Arclight Labs", detail: "Shipped the customer portal and billing service from first commit to 12k monthly users. Owned the on-call rotation for both." },
     { range: "2021 — 2022", role: "Freelance Developer", detail: "Twenty-odd sites and small apps for local businesses. Learned more about scoping and saying no than about any framework." },
   ],
+  theme: { accent: "#4f8dff", signal: "#3ddc84", phase: "#ff9a3c" },
   links: {
     email: "rafi.sheikh@example.com",
     contact: [

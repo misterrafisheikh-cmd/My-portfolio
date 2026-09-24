@@ -1,3 +1,7 @@
+// ============================================================
+// ScrollProgress — the thin colored line at the very top of the page
+// that fills left-to-right as the visitor scrolls down. Purely visual.
+// ============================================================
 import { useScrollProgress } from "../hooks/useScrollProgress.js";
 
 export default function ScrollProgress() {

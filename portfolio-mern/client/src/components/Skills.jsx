@@ -1,3 +1,11 @@
+// ============================================================
+// Skills — the "02 — Skills" section: three cards (Interface/Systems/
+// Delivery by default, but fully editable), each with animated
+// percentage bars, plus a scrolling ticker of tech names at the
+// bottom. Bar widths animate from 0% to their real value the moment
+// the card scrolls into view (see the MutationObserver watching for
+// the "in" class that useReveal adds).
+// ============================================================
 import { useEffect, useState } from "react";
 import { useReveal } from "../hooks/useReveal.js";
 import { useContent } from "../context/ContentContext.jsx";

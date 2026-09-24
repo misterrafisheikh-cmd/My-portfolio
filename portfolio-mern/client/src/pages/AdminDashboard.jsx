@@ -1,3 +1,7 @@
+// ============================================================
+// AdminDashboard — the "Messages" page (/admin). Lists every contact-
+// form submission, newest first, with mark-as-read/unread and delete.
+// ============================================================
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext.jsx";

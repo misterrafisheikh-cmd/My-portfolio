@@ -1,3 +1,9 @@
+// ============================================================
+// contact.routes.js — maps URLs to the functions in
+// contact.controller.js. POST / is public (the contact form). The
+// rest need requireAdmin (a valid login token) — that's what makes
+// the Messages dashboard private.
+// ============================================================
 import { Router } from "express";
 import { createMessage, listMessages, markRead, deleteMessage } from "../controllers/contact.controller.js";
 import { requireAdmin } from "../middleware/auth.js";

@@ -1,10 +1,19 @@
+// ============================================================
+// AdminContent — the "Edit content" page (/admin/content). Loads the
+// whole site's content into `form` on open, lets you edit it tab by
+// tab (Hero/About/Skills/Projects/Timeline/Links/Theme/Sections), and
+// sends the whole thing back with one "Save changes" click. Nothing
+// saves automatically — if you navigate away without clicking Save,
+// your edits are lost (a normal, deliberate choice: it means a half-
+// finished edit never accidentally goes live).
+// ============================================================
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext.jsx";
 import { fetchContentAdmin, saveContent } from "../lib/contentApi.js";
 import { Field, Input, TextArea, Card, AddButton, TabBtn } from "../components/admin/fields.jsx";
 
-const TABS = ["Hero", "About", "Skills", "Projects", "Timeline", "Links", "Sections"];
+const TABS = ["Hero", "About", "Skills", "Projects", "Timeline", "Links", "Theme", "Sections"];
 const uid = () => Math.random().toString(36).slice(2, 9);
 
 export default function AdminContent() {
@@ -99,6 +108,45 @@ export default function AdminContent() {
           <div className="grid gap-6">
             <Field label="Short blurb (top-right of the About section)">
               <TextArea value={form.about.blurb} onChange={(e) => setForm({ ...form, about: { ...form.about, blurb: e.target.value } })} />
+            </Field>
+
+            <Field label="Photo (upload a file, or paste an image URL below)">
+              <div className="flex items-center gap-4">
+                {form.about.avatarUrl && (
+                  <img src={form.about.avatarUrl} alt="Preview" className="h-16 w-16 rounded-[10px] object-cover" style={{ border: "1px solid var(--line)" }} />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    // FileReader turns the chosen image into a "data URL" — a
+                    // long text string starting with data:image/... that a
+                    // browser can display exactly like a normal image link.
+                    // This avoids needing a separate file-upload server: the
+                    // whole image is just stored as text in the database.
+                    // Keep photos modest in size (a few hundred KB) since a
+                    // very large image makes this text very long.
+                    const reader = new FileReader();
+                    reader.onload = () => setForm({ ...form, about: { ...form.about, avatarUrl: reader.result } });
+                    reader.readAsDataURL(file);
+                  }}
+                  className="text-[0.85rem]"
+                />
+              </div>
+            </Field>
+            <Field label="...or an image URL (leave blank to show initials instead)">
+              <Input
+                placeholder="https://..."
+                value={form.about.avatarUrl?.startsWith("data:") ? "" : form.about.avatarUrl || ""}
+                onChange={(e) => setForm({ ...form, about: { ...form.about, avatarUrl: e.target.value } })}
+              />
+              {form.about.avatarUrl && (
+                <button type="button" onClick={() => setForm({ ...form, about: { ...form.about, avatarUrl: "" } })} className="mt-1 text-left text-[0.76rem]" style={{ color: "var(--phase)" }}>
+                  Remove photo
+                </button>
+              )}
             </Field>
 
             <div>
@@ -239,7 +287,7 @@ export default function AdminContent() {
                     <option value="tool">Tool</option>
                     <option value="lab">Experiment</option>
                   </select>
-                  <Input placeholder="Link (URL or #contact)" value={p.link} onChange={(e) => {
+                  <Input placeholder="Live link (https://...) — leave #contact if none yet" value={p.link} onChange={(e) => {
                     const projects = [...form.projects]; projects[i] = { ...p, link: e.target.value };
                     setForm({ ...form, projects });
                   }} />
@@ -308,6 +356,39 @@ export default function AdminContent() {
               </Card>
             ))}
             <AddButton onClick={() => setForm({ ...form, links: { ...form.links, contact: [...form.links.contact, { label: "", type: "", copy: "" }] } })}>Add contact link</AddButton>
+          </div>
+        )}
+
+        {tab === "Theme" && (
+          <div className="grid gap-6">
+            <p className="text-[0.85rem]" style={{ color: "var(--muted)" }}>
+              These three colors are used across the whole site — buttons, links, the pulsing
+              "open to work" dot, skill bars, and highlights. Pick a color, or type a hex code
+              directly (e.g. #4f8dff). Changes apply the moment you save, in both light and dark mode.
+            </p>
+            {[
+              { key: "accent", label: "Accent — buttons, links, primary highlights" },
+              { key: "signal", label: "Signal — success/positive touches (the status dot, skill bars)" },
+              { key: "phase", label: "Highlight — the active nav underline and a few small accents" },
+            ].map(({ key, label }) => (
+              <Field key={key} label={label}>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={form.theme?.[key] || "#4f8dff"}
+                    onChange={(e) => setForm({ ...form, theme: { ...form.theme, [key]: e.target.value } })}
+                    className="h-10 w-14 cursor-pointer rounded-[8px] border p-1"
+                    style={{ borderColor: "var(--line)" }}
+                  />
+                  <Input
+                    value={form.theme?.[key] || ""}
+                    onChange={(e) => setForm({ ...form, theme: { ...form.theme, [key]: e.target.value } })}
+                    placeholder="#4f8dff"
+                    className="max-w-[140px]"
+                  />
+                </div>
+              </Field>
+            ))}
           </div>
         )}
 

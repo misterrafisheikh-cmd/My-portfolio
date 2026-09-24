@@ -1,3 +1,7 @@
+// ============================================================
+// Footer — the small bar at the very bottom of the page (copyright
+// year + a tagline). The year updates itself automatically.
+// ============================================================
 export default function Footer() {
   return (
     <footer className="border-t py-10" style={{ borderColor: "var(--line)" }}>
