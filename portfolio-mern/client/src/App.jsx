@@ -3,6 +3,7 @@ import { AdminAuthProvider } from "./context/AdminAuthContext.jsx";
 import RequireAdminAuth from "./components/RequireAdminAuth.jsx";
 import Toast from "./components/Toast.jsx";
 import Home from "./pages/Home.jsx";
+import ArticleReader from "./pages/ArticleReader.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminContent from "./pages/AdminContent.jsx";
@@ -15,6 +16,7 @@ export default function App() {
       <AdminAuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/read/:sectionId/:itemId" element={<ArticleReader />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"

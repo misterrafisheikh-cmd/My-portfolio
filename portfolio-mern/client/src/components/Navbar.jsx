@@ -1,13 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useScrollProgress } from "../hooks/useScrollProgress.js";
-import { navLinks } from "../data/links.js";
+import { useContent } from "../context/ContentContext.jsx";
+import { navLinks as staticLinks } from "../data/links.js";
 
 export default function Navbar() {
   const { theme, toggle } = useTheme();
   const { scrolled } = useScrollProgress();
+  const { extraSections } = useContent();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
+
+  // Static links (Home/About/Skills/Projects/Contact) plus one per
+  // admin-added section, inserted right before Contact to match the
+  // order they render on the page (see pages/Home.jsx).
+  const navLinks = useMemo(() => {
+    const links = [...staticLinks];
+    const contactIndex = links.findIndex((l) => l.href === "#contact");
+    const extraLinks = (extraSections || []).map((s) => ({ href: `#section-${s.id}`, label: s.title || "Section" }));
+    links.splice(contactIndex === -1 ? links.length : contactIndex, 0, ...extraLinks);
+    return links;
+  }, [extraSections]);
 
   useEffect(() => {
     const sections = navLinks.map((l) => document.getElementById(l.href.slice(1))).filter(Boolean);
@@ -21,7 +34,7 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [navLinks]);
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[80]">
@@ -48,7 +61,7 @@ export default function Navbar() {
             scrolled ? "py-2.5" : "py-4"
           }`}
         >
-          <a href="#home" className="mr-0.4 whitespace-nowrap text-[1.02rem] font-bold tracking-tight">
+          <a href="#home" className="mr-3.5 whitespace-nowrap text-[1.02rem] font-bold tracking-tight">
             Rafi Sheikh{" "}
             <span className="font-mono" style={{ color: "var(--blue)" }}>
               "<i className="animate-blink not-italic">_</i>"
@@ -56,7 +69,7 @@ export default function Navbar() {
           </a>
 
           <nav
-            className={`flex items-center gap-0.5 max-md:absolute max-md:left-0 max-md:right-0 max-md:top-[calc(100%)+10px] max-md:flex-col max-md:items-stretch max-md:gap-0.5 max-md:rounded-[20px] max-md:border max-md:p-2.5 max-md:shadow-[var(--shadow)] max-md:transition-all max-md:duration-200 ${
+            className={`flex items-center gap-0.5 max-md:absolute max-md:left-0 max-md:right-0 max-md:top-[calc(100%+10px)] max-md:flex-col max-md:items-stretch max-md:gap-0.5 max-md:rounded-[20px] max-md:border max-md:p-2.5 max-md:shadow-[var(--shadow)] max-md:transition-all max-md:duration-200 ${
               open ? "max-md:pointer-events-auto max-md:opacity-100" : "max-md:pointer-events-none max-md:-translate-y-2 max-md:opacity-0"
             }`}
             style={{ borderColor: "var(--line)", background: "var(--panel-solid)" }}

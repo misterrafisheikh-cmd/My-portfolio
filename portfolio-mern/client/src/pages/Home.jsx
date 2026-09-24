@@ -5,6 +5,7 @@ import Hero from "../components/Hero.jsx";
 import About from "../components/About.jsx";
 import Skills from "../components/Skills.jsx";
 import Projects from "../components/Projects.jsx";
+import ExtraSections from "../components/ExtraSections.jsx";
 import Contact from "../components/Contact.jsx";
 import Footer from "../components/Footer.jsx";
 import ScrollProgress from "../components/ScrollProgress.jsx";
@@ -26,6 +27,7 @@ export default function Home() {
         <About />
         <Skills />
         <Projects />
+        <ExtraSections />
         <Contact />
       </main>
       <Footer />

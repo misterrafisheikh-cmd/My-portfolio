@@ -125,10 +125,36 @@ const contentSchema = new mongoose.Schema(
         ],
       },
     },
-    // Free-form blocks the admin can add without any code change —
+    // Free-form sections the admin can add without any code change —
     // rendered on the homepage, in order, between Projects and Contact.
+    // `layout` picks how it's drawn: "text" (a paragraph + bullet list,
+    // like About), "cards" (a grid of items, optionally linking out),
+    // "links" (each row is itself a clickable external link), or
+    // "articles" (a list of titles — clicking one opens a dedicated
+    // page showing that item's full `body` text, for long-form writing
+    // like research notes or course descriptions).
     extraSections: {
-      type: [{ id: String, title: String, body: String, items: [String] }],
+      type: [
+        {
+          id: String,
+          title: String,
+          layout: { type: String, default: "text" }, // text | cards | links | articles
+          body: String,
+          bullets: [String],
+          items: {
+            type: [
+              {
+                id: String,
+                title: String,
+                description: String,
+                link: String,
+                body: String,
+              },
+            ],
+            default: [],
+          },
+        },
+      ],
       default: [],
     },
   },

@@ -3,7 +3,6 @@ import { useReveal } from "../hooks/useReveal.js";
 import { useContent } from "../context/ContentContext.jsx";
 import ProjectCard from "./ProjectCard.jsx";
 import Timeline from "./Timeline.jsx";
-import ExtraSections from "./ExtraSections.jsx";
 import SectionHead from "./SectionHead.jsx";
 
 const filters = [
@@ -54,7 +53,6 @@ export default function Projects() {
 
         <Timeline />
       </div>
-      <ExtraSections />
     </section>
   );
 }

@@ -312,29 +312,111 @@ export default function AdminContent() {
         )}
 
         {tab === "Sections" && (
-          <div className="grid gap-4">
+          <div className="grid gap-5">
             <p className="text-[0.85rem]" style={{ color: "var(--muted)" }}>
-              These appear on the homepage between Projects and Contact — no code or redeploy needed.
-              Good for things like "Services" or "Testimonials". For a genuinely new custom-designed
-              piece of the page, that still needs a developer.
+              Pick a layout per section. <b>Text</b> is a paragraph + bullet list (like About).
+              <b> Cards</b> is a grid with an optional outbound link on each card.
+              <b> Links</b> makes every item a clickable row that jumps straight to its link.
+              <b> Articles</b> lists titles — clicking one opens a dedicated page showing that
+              item's full write-up, for long-form content like research notes or course
+              descriptions. New sections appear on the homepage and in the nav automatically.
             </p>
-            {form.extraSections.map((s, i) => (
-              <Card key={s.id || i} onRemove={() => setForm({ ...form, extraSections: form.extraSections.filter((_, x) => x !== i) })}>
-                <Input placeholder="Title" value={s.title} onChange={(e) => {
-                  const extraSections = [...form.extraSections]; extraSections[i] = { ...s, title: e.target.value };
-                  setForm({ ...form, extraSections });
-                }} />
-                <TextArea placeholder="Body text" value={s.body} onChange={(e) => {
-                  const extraSections = [...form.extraSections]; extraSections[i] = { ...s, body: e.target.value };
-                  setForm({ ...form, extraSections });
-                }} />
-                <Input placeholder="Bullet list items (comma-separated, optional)" value={csv(s.items)} onChange={(e) => {
-                  const extraSections = [...form.extraSections]; extraSections[i] = { ...s, items: parseCsv(e.target.value) };
-                  setForm({ ...form, extraSections });
-                }} />
-              </Card>
-            ))}
-            <AddButton onClick={() => setForm({ ...form, extraSections: [...form.extraSections, { id: uid(), title: "", body: "", items: [] }] })}>
+
+            {form.extraSections.map((s, si) => {
+              const setSection = (patch) => {
+                const extraSections = [...form.extraSections];
+                extraSections[si] = { ...s, ...patch };
+                setForm({ ...form, extraSections });
+              };
+              const setItem = (ii, patch) => {
+                const items = [...s.items];
+                items[ii] = { ...items[ii], ...patch };
+                setSection({ items });
+              };
+              const addItem = () => setSection({ items: [...s.items, { id: uid(), title: "", description: "", link: "", body: "" }] });
+              const removeItem = (ii) => setSection({ items: s.items.filter((_, x) => x !== ii) });
+
+              return (
+                <Card key={s.id} onRemove={() => setForm({ ...form, extraSections: form.extraSections.filter((_, x) => x !== si) })}>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input placeholder="Section title (e.g. Research)" value={s.title} onChange={(e) => setSection({ title: e.target.value })} />
+                    <select
+                      value={s.layout || "text"}
+                      onChange={(e) => setSection({ layout: e.target.value })}
+                      className="rounded-[10px] border px-3.5 py-2.5 text-[0.92rem]"
+                      style={{ borderColor: "var(--line)", background: "var(--panel)" }}
+                    >
+                      <option value="text">Text (paragraph + bullets)</option>
+                      <option value="cards">Cards (grid)</option>
+                      <option value="links">Links (clickable rows)</option>
+                      <option value="articles">Articles (full-page read)</option>
+                    </select>
+                  </div>
+
+                  {s.layout !== "text" && (
+                    <TextArea placeholder="Optional intro text shown above the items" value={s.body} onChange={(e) => setSection({ body: e.target.value })} />
+                  )}
+
+                  {s.layout === "text" && (
+                    <>
+                      <TextArea placeholder="Body text" value={s.body} onChange={(e) => setSection({ body: e.target.value })} />
+                      <Input
+                        placeholder="Bullet points (comma-separated, optional)"
+                        value={csv(s.bullets)}
+                        onChange={(e) => setSection({ bullets: parseCsv(e.target.value) })}
+                      />
+                    </>
+                  )}
+
+                  {s.layout !== "text" && (
+                    <div className="grid gap-3">
+                      <p className="text-[0.8rem] font-semibold" style={{ color: "var(--faint)" }}>Items</p>
+                      {s.items.map((it, ii) => (
+                        <div key={it.id} className="rounded-[10px] border p-3.5" style={{ borderColor: "var(--line)" }}>
+                          <div className="mb-2 grid gap-2 sm:grid-cols-2">
+                            <Input placeholder="Title" value={it.title} onChange={(e) => setItem(ii, { title: e.target.value })} />
+                            {(s.layout === "cards" || s.layout === "links") && (
+                              <Input
+                                placeholder={s.layout === "links" ? "Link (required — where this row goes)" : "Link (optional — 'Visit' button)"}
+                                value={it.link}
+                                onChange={(e) => setItem(ii, { link: e.target.value })}
+                              />
+                            )}
+                          </div>
+                          <Input
+                            placeholder={s.layout === "articles" ? "Short teaser shown in the list" : "Description (optional)"}
+                            value={it.description}
+                            onChange={(e) => setItem(ii, { description: e.target.value })}
+                            className="mb-2"
+                          />
+                          {s.layout === "articles" && (
+                            <TextArea
+                              placeholder="Full content — shown on the item's own page, as long as you like"
+                              value={it.body}
+                              onChange={(e) => setItem(ii, { body: e.target.value })}
+                              style={{ minHeight: "160px" }}
+                            />
+                          )}
+                          <button type="button" onClick={() => removeItem(ii)} className="mt-2 text-[0.76rem]" style={{ color: "var(--phase)" }}>
+                            Remove item
+                          </button>
+                        </div>
+                      ))}
+                      <AddButton onClick={addItem}>Add item</AddButton>
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
+
+            <AddButton
+              onClick={() =>
+                setForm({
+                  ...form,
+                  extraSections: [...form.extraSections, { id: uid(), title: "", layout: "text", body: "", bullets: [], items: [] }],
+                })
+              }
+            >
               Add section
             </AddButton>
           </div>
