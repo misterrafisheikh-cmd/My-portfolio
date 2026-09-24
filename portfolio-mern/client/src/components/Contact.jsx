@@ -71,7 +71,7 @@ export default function Contact() {
           <form ref={formRef} onSubmit={submit} noValidate className="rv grid gap-4">
             <div className="grid gap-[7px]">
               <label htmlFor="name" className="text-[0.8rem]" style={{ color: "var(--faint)" }}>Your name</label>
-              <input id="name" name="name" value={values.name} onChange={change} autoComplete="name" placeholder="Ayesha Rahman"
+              <input id="name" name="name" value={values.name} onChange={change} autoComplete="name" placeholder="Rafi Sheikh"
                 className={field} style={{ borderColor: "var(--line)", background: "var(--panel)" }} />
               <p className="min-h-[1em] text-[0.76rem]" style={{ color: "var(--phase)" }}>{errors.name}</p>
             </div>
@@ -83,7 +83,7 @@ export default function Contact() {
             </div>
             <div className="grid gap-[7px]">
               <label htmlFor="msg" className="text-[0.8rem]" style={{ color: "var(--faint)" }}>What do you need?</label>
-              <textarea id="msg" name="message" value={values.message} onChange={change} placeholder="A short brief, a timeline, and a budget range if you have one."
+              <textarea id="msg" name="message" value={values.message} onChange={change} placeholder="A short brief, a timeline, and a budget range if you have one or ask for a meeting"
                 className={`${field} min-h-[130px] resize-y`} style={{ borderColor: "var(--line)", background: "var(--panel)" }} />
               <p className="min-h-[1em] text-[0.76rem]" style={{ color: "var(--phase)" }}>{errors.message}</p>
             </div>
