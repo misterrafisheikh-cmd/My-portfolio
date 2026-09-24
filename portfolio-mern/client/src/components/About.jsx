@@ -42,7 +42,7 @@ export default function About() {
         <SectionHead
           revealRef={headRef}
           tag="01 — About"
-          title={<>Engineer first,<br />designer by necessity.</>}
+          title={<>I do what I  ,<br /> Love and Enjoy to do and I learn from every dots.</>}
           blurb={about.blurb}
         />
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[0.85fr_1.15fr] md:gap-14">
