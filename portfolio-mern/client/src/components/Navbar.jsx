@@ -188,7 +188,7 @@ export default function Navbar() {
         {/* The animated sea-wave edge at the bottom of the bar.
             data-wave-edge is how Rain.jsx finds this element's position,
             so its raindrops start falling from exactly here. */}
-        <div data-wave-edge className="pointer-events-none absolute left-0 right-0 top-full h-14 animate-swell overflow-hidden">
+        {/* <div data-wave-edge className="pointer-events-none absolute left-0 right-0 top-full h-14 animate-swell overflow-hidden">
           <svg viewBox="0 0 1440 56" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
             <path
               className="animate-driftA"
@@ -213,7 +213,13 @@ export default function Navbar() {
               d="M0,46 C101,55 179,55 280,46 C381,37 459,37 560,46 C661,55 739,55 840,46 C941,37 1019,37 1120,46 C1221,55 1299,55 1400,46 C1501,37 1579,37 1680,46 C1781,55 1859,55 1960,46 C2061,37 2139,37 2240,46 C2341,55 2419,55 2520,46 C2621,37 2699,37 2800,46"
             />
           </svg>
-        </div>
+        </div> */}
+
+        
+        
+
+
+
       </div>
     </header>
   );
