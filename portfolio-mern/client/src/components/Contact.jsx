@@ -71,13 +71,13 @@ export default function Contact() {
           <form ref={formRef} onSubmit={submit} noValidate className="rv grid gap-4">
             <div className="grid gap-[7px]">
               <label htmlFor="name" className="text-[0.8rem]" style={{ color: "var(--faint)" }}>Your name</label>
-              <input id="name" name="name" value={values.name} onChange={change} autoComplete="name" placeholder="Ayesha Rahman"
+              <input id="name" name="name" value={values.name} onChange={change} autoComplete="name" placeholder="Rafi Sheikh"
                 className={field} style={{ borderColor: "var(--line)", background: "var(--panel)" }} />
               <p className="min-h-[1em] text-[0.76rem]" style={{ color: "var(--phase)" }}>{errors.name}</p>
             </div>
             <div className="grid gap-[7px]">
               <label htmlFor="email" className="text-[0.8rem]" style={{ color: "var(--faint)" }}>Email</label>
-              <input id="email" name="email" type="email" value={values.email} onChange={change} autoComplete="email" placeholder="you@company.com"
+              <input id="email" name="email" type="email" value={values.email} onChange={change} autoComplete="email" placeholder="xyz@gmail.com"
                 className={field} style={{ borderColor: "var(--line)", background: "var(--panel)" }} />
               <p className="min-h-[1em] text-[0.76rem]" style={{ color: "var(--phase)" }}>{errors.email}</p>
             </div>
