@@ -146,3 +146,9 @@ NOTIFY_EMAIL=
 ```
 VITE_API_URL=https://your-api-domain.com
 ```
+
+## Speed & separate pages (latest update)
+- **Images** are stored in their own MongoDB collection (`Media`) and served from `/api/media/<id>` with a 1-year cache. The browser shrinks photos before upload, so admin saves stay fast.
+- **Content cache**: the site paints instantly from the last copy saved in the visitor's browser, then refreshes in the background (`client/src/context/ContentContext.jsx`).
+- **Own page for a section**: `/admin/content` → Sections → tick "Show on its own page" (e.g. Research → `/research`). It leaves the homepage, gets its own nav link, and the page shows only that section.
+- Render free tier sleeps after ~15 min idle; point a free pinger (UptimeRobot) at `https://<your-api>.onrender.com/api/health` every 5 min to keep it awake.

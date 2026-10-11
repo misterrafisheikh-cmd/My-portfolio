@@ -85,33 +85,49 @@ function ArticlesLayout({ section }) {
 
 const LAYOUTS = { text: TextLayout, cards: CardsLayout, links: LinksLayout, articles: ArticlesLayout };
 
+// The inside of a section (intro text + the chosen layout). Shared by
+// the homepage block below AND the full-page view (pages/SectionPage.jsx).
+export function SectionBody({ section, showIntro = true }) {
+  const Layout = LAYOUTS[section.layout] || TextLayout;
+  const items = section.items || [];
+  const empty = section.layout !== "text" && items.length === 0;
+  return (
+    <div>
+      {showIntro && section.layout !== "text" && section.body && (
+        <p className="m-0 mb-6 max-w-[70ch]" style={{ color: "var(--muted)" }}>{section.body}</p>
+      )}
+      {empty ? <p style={{ color: "var(--faint)" }}>Nothing here yet.</p> : <Layout section={{ ...section, items }} />}
+    </div>
+  );
+}
+
+// One homepage block. `number` is its "05 — Section" label.
 function ExtraSection({ section, number }) {
   const headRef = useReveal();
   const bodyRef = useReveal();
-  const Layout = LAYOUTS[section.layout] || TextLayout;
 
   return (
     <section id={`section-${section.id}`} className="py-[110px]">
       <div className="mx-auto w-[min(1180px,100%-44px)]">
-        <SectionHead revealRef={headRef} tag={`0${number} — Section`} title={section.title} />
+        <SectionHead revealRef={headRef} tag={`${String(number).padStart(2, "0")} — Section`} title={section.title} />
         <div ref={bodyRef} className="rv">
-          {section.layout !== "text" && section.body && (
-            <p className="m-0 mb-6 max-w-[70ch]" style={{ color: "var(--muted)" }}>{section.body}</p>
-          )}
-          <Layout section={section} />
+          <SectionBody section={section} />
         </div>
       </div>
     </section>
   );
 }
 
+// Homepage list. Sections ticked "Show on its own page" are skipped
+// here — they live at their own URL instead (and get a nav link).
 export default function ExtraSections() {
   const { extraSections } = useContent();
-  if (!extraSections?.length) return null;
+  const onHome = (extraSections || []).filter((s) => !s.separatePage);
+  if (!onHome.length) return null;
 
   return (
     <>
-      {extraSections.map((s, i) => (
+      {onHome.map((s, i) => (
         <ExtraSection key={s.id} section={s} number={i + 5} />
       ))}
     </>

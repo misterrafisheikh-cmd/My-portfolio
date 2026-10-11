@@ -150,6 +150,8 @@ const contentSchema = new mongoose.Schema(
           id: String,
           title: String,
           layout: { type: String, default: "text" }, // text | cards | links | articles
+          slug: { type: String, default: "" },        // URL name when shown on its own page, e.g. "research" -> /research
+          separatePage: { type: Boolean, default: false }, // true = own full page instead of a homepage block
           body: String,
           bullets: [String],
           items: {

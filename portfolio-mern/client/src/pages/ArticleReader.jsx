@@ -1,25 +1,18 @@
-import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-
-const BASE = import.meta.env.VITE_API_URL || "";
+import { useContentApi } from "../context/ContentContext.jsx";
+import { sectionSlug } from "../lib/slug.js";
+import PageShell from "../components/PageShell.jsx";
 
 // The full-page reading view for an "articles"-layout section item.
-// Self-contained fetch (doesn't rely on ContentContext) since this
-// route is opened directly, often as a fresh page load or a shared link.
+// Uses the shared (cached) content, so it opens instantly.
 export default function ArticleReader() {
   const { sectionId, itemId } = useParams();
-  const [state, setState] = useState({ loading: true, section: null, item: null });
-
-  useEffect(() => {
-    fetch(`${BASE}/api/content`)
-      .then((r) => r.json())
-      .then((content) => {
-        const section = content.extraSections?.find((s) => s.id === sectionId);
-        const item = section?.items?.find((i) => i.id === itemId);
-        setState({ loading: false, section, item });
-      })
-      .catch(() => setState({ loading: false, section: null, item: null }));
-  }, [sectionId, itemId]);
+  const { content, loaded } = useContentApi();
+  const section = content.extraSections?.find((s) => s.id === sectionId);
+  const item = section?.items?.find((i) => i.id === itemId);
+  const state = { loading: !loaded && !item, section, item };
+  // Go back to the section's own page if it has one, else the homepage block.
+  const backTo = section ? (section.separatePage ? `/${sectionSlug(section)}` : `/#section-${section.id}`) : "/";
 
   if (state.loading) {
     return <Centered><p style={{ color: "var(--muted)" }}>Loading…</p></Centered>;
@@ -35,9 +28,9 @@ export default function ArticleReader() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
-      <div className="mx-auto w-[min(760px,100%-44px)] py-16">
-        <Link to={`/#section-${state.section.id}`} className="mb-8 inline-flex items-center gap-1.5 text-[0.88rem]" style={{ color: "var(--muted)" }}>
+    <PageShell>
+      <div className="mx-auto w-[min(760px,100%-44px)] pb-24 pt-[130px]">
+        <Link to={backTo} className="mb-8 inline-flex items-center gap-1.5 text-[0.88rem]" style={{ color: "var(--muted)" }}>
           ← Back to {state.section.title}
         </Link>
         <p className="mb-2 font-mono text-[0.74rem] tracking-[.14em]" style={{ color: "var(--faint)" }}>{state.section.title.toUpperCase()}</p>
@@ -46,7 +39,7 @@ export default function ArticleReader() {
           {state.item.body || state.item.description || "No content yet."}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

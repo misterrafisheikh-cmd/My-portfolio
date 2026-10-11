@@ -11,13 +11,26 @@
 //     where to start falling from).
 // ============================================================
 import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { sectionSlug } from "../lib/slug.js";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useScrollProgress } from "../hooks/useScrollProgress.js";
 import { useContent } from "../context/ContentContext.jsx";
 import { navLinks as staticLinks } from "../data/links.js";
 import Clock from "./Clock.jsx";
 
+// A nav link that works from ANY page. "#about" on the homepage is a
+// normal in-page jump; on other pages (e.g. /research) it becomes
+// "/#about" so it takes you back home first. `to` links go to a page.
+function NavAnchor({ href, to, onHome, ...props }) {
+  if (to) return <Link to={to} {...props} />;
+  if (onHome) return <a href={href} {...props} />;
+  return <Link to={`/${href}`} {...props} />;
+}
+
 export default function Navbar() {
+  const { pathname } = useLocation();
+  const onHome = pathname === "/";
   const { theme, toggle } = useTheme();           // dark/light mode + the function to flip it
   const { scrolled } = useScrollProgress();        // true once the page has scrolled a bit (shrinks the bar)
   const { extraSections } = useContent();          // any sections the admin added from the dashboard
@@ -33,7 +46,12 @@ export default function Navbar() {
   const navLinks = useMemo(() => {
     const links = [...staticLinks];
     const contactIndex = links.findIndex((l) => l.href === "#contact");
-    const extraLinks = (extraSections || []).map((s) => ({ href: `#section-${s.id}`, label: s.title || "Section" }));
+    // Sections ticked "own page" link to their page (/research); the rest scroll to their block.
+    const extraLinks = (extraSections || []).map((s) =>
+      s.separatePage
+        ? { to: `/${sectionSlug(s)}`, label: s.title || "Section" }
+        : { href: `#section-${s.id}`, label: s.title || "Section" }
+    );
     links.splice(contactIndex === -1 ? links.length : contactIndex, 0, ...extraLinks);
     return links;
   }, [extraSections]);
@@ -43,7 +61,8 @@ export default function Navbar() {
   // "active" (gives it the underline). Re-runs if navLinks changes,
   // e.g. once admin-added sections finish loading.
   useEffect(() => {
-    const sections = navLinks.map((l) => document.getElementById(l.href.slice(1))).filter(Boolean);
+    if (!onHome) return undefined; // scroll-spy only makes sense on the homepage
+    const sections = navLinks.filter((l) => l.href).map((l) => document.getElementById(l.href.slice(1))).filter(Boolean);
     const onScroll = () => {
       let current = sections[0]?.id;
       for (const s of sections) {
@@ -54,7 +73,7 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, [navLinks]);
+  }, [navLinks, onHome]);
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[80]">
@@ -84,12 +103,12 @@ export default function Navbar() {
           }`}
         >
           {/* Site name / logo — jumps to the top of the page */}
-          <a href="#home" className="mr-3.5 whitespace-nowrap text-[1.02rem] font-bold tracking-tight">
+          <NavAnchor href="#home" onHome={onHome} className="mr-3.5 whitespace-nowrap text-[1.02rem] font-bold tracking-tight">
             Rafi Sheikh{" "}
             <span className="font-mono" style={{ color: "var(--blue)" }}>
               "<i className="animate-blink not-italic">_</i>"
             </span>
-          </a>
+          </NavAnchor>
 
           {/* Nav links. On phones this becomes a dropdown (see the max-md: classes)
               that opens below the bar when the hamburger button is tapped. */}
@@ -99,23 +118,30 @@ export default function Navbar() {
             }`}
             style={{ borderColor: "var(--line)", background: "var(--panel-solid)" }}
           >
-            {navLinks.map((l) => (
-              <a
-                key={l.href}
+            {navLinks.map((l) => {
+              const key = l.to || l.href;
+              // active = this page's own link, or (on home) the section in view
+              const isActive = l.to ? pathname === l.to : onHome && active === l.href.slice(1);
+              return (
+              <NavAnchor
+                key={key}
                 href={l.href}
+                to={l.to}
+                onHome={onHome}
                 onClick={() => setOpen(false)} // closes the mobile dropdown after tapping a link
                 className="relative rounded-full px-3.5 py-2 text-[0.925rem] transition-colors"
-                style={{ color: active === l.href.slice(1) ? "var(--text)" : "var(--muted)" }}
+                style={{ color: isActive ? "var(--text)" : "var(--muted)" }}
               >
                 {l.label}
-                {active === l.href.slice(1) && (
+                {isActive && (
                   <span
                     className="absolute bottom-0.5 left-3.5 right-3.5 h-0.5 rounded max-md:left-3.5 max-md:right-auto max-md:w-4"
                     style={{ background: "var(--phase)" }}
                   />
                 )}
-              </a>
-            ))}
+              </NavAnchor>
+              );
+            })}
           </nav>
 
           {/* Right-hand cluster: live clock, dark/light toggle, mobile menu button, Hire Me */}
@@ -148,13 +174,14 @@ export default function Navbar() {
               </svg>
             </button>
 
-            <a
+            <NavAnchor
               href="#contact"
+              onHome={onHome}
               className="whitespace-nowrap rounded-full px-5 py-2.5 text-[0.93rem] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(47,107,255,.85)] transition-transform hover:-translate-y-0.5 max-md:hidden"
               style={{ background: "linear-gradient(135deg,#2f6bff,#6aa0ff)" }}
             >
               Hire Me
-            </a>
+            </NavAnchor>
           </div>
         </div>
 

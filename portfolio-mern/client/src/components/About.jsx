@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useReveal } from "../hooks/useReveal.js";
 import { useCountUp } from "../hooks/useCountUp.js";
 import { useContent } from "../context/ContentContext.jsx";
+import { resolveMedia } from "../lib/media.js";
 import SectionHead from "./SectionHead.jsx";
 
 function Stat({ n, suffix = "", label }) {
@@ -42,7 +43,7 @@ export default function About() {
         <SectionHead
           revealRef={headRef}
           tag="01 — About"
-          title={<>I do what I  ,<br /> Love and Enjoy to do and I learn from every dots.</>}
+          title={<>Engineer first,<br />designer by necessity.</>}
           blurb={about.blurb}
         />
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[0.85fr_1.15fr] md:gap-14">
@@ -50,7 +51,7 @@ export default function About() {
             <div className="aspect-square overflow-hidden rounded-[10px] border grid place-items-center text-[clamp(3rem,9vw,4.4rem)] font-bold tracking-[-.06em]"
               style={{ borderColor: "var(--line)", background: "radial-gradient(circle at 30% 25%, var(--blue-soft), transparent 60%), linear-gradient(160deg, rgba(120,158,224,.12), transparent)" }}>
               {about.avatarUrl ? (
-                <img src={about.avatarUrl} alt={hero.name} className="h-full w-full object-cover" />
+                <img src={resolveMedia(about.avatarUrl)} alt={hero.name} width="600" height="600" decoding="async" className="h-full w-full object-cover" />
               ) : (
                 initials
               )}

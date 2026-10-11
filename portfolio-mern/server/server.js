@@ -7,12 +7,14 @@
 // ============================================================
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import { connectDB } from "./config/db.js";
 import contactRoutes from "./routes/contact.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import contentRoutes from "./routes/content.routes.js";
+import mediaRoutes from "./routes/media.routes.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -21,10 +23,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || "http://localhost:5173" }));
-// The default 50kb limit is fine for the contact form, but a profile
-// photo saved as a base64 data URL (see AdminContent.jsx) can run to a
-// few hundred KB or more, so the content-save endpoint needs headroom.
-app.use(express.json({ limit: "8mb" }));
+// gzip every response — makes the JSON content several times smaller.
+app.use(compression());
+// Image uploads arrive as base64 text (already shrunk by the browser to
+// well under 1MB), so we need headroom above the 100kb default.
+app.use(express.json({ limit: "3mb" }));
 
 // Basic abuse guard on the public contact endpoint.
 const contactLimiter = rateLimit({
@@ -46,6 +49,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.use("/api/contact", contactLimiter, contactRoutes);
 app.use("/api/admin", loginLimiter, authRoutes);
 app.use("/api/content", contentRoutes);
+app.use("/api/media", mediaRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

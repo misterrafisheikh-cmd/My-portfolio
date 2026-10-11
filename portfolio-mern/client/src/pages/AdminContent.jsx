@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext.jsx";
 import { fetchContentAdmin, saveContent } from "../lib/contentApi.js";
+import { slugify } from "../lib/slug.js";
+import { uploadImage, resolveMedia } from "../lib/media.js";
 import { Field, Input, TextArea, Card, AddButton, TabBtn } from "../components/admin/fields.jsx";
 
 const TABS = ["Hero", "About", "Skills", "Projects", "Timeline", "Links", "Theme", "Sections"];
@@ -23,6 +25,7 @@ export default function AdminContent() {
   const [tab, setTab] = useState("Hero");
   const [status, setStatus] = useState(""); // "", "saving", "saved", error text
   const [loadError, setLoadError] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchContentAdmin().then(setForm).catch((e) => setLoadError(e.message));
@@ -113,33 +116,40 @@ export default function AdminContent() {
             <Field label="Photo (upload a file, or paste an image URL below)">
               <div className="flex items-center gap-4">
                 {form.about.avatarUrl && (
-                  <img src={form.about.avatarUrl} alt="Preview" className="h-16 w-16 rounded-[10px] object-cover" style={{ border: "1px solid var(--line)" }} />
+                  <img src={resolveMedia(form.about.avatarUrl)} alt="Preview" className="h-16 w-16 rounded-[10px] object-cover" style={{ border: "1px solid var(--line)" }} />
                 )}
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => {
+                  disabled={uploading}
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    // FileReader turns the chosen image into a "data URL" — a
-                    // long text string starting with data:image/... that a
-                    // browser can display exactly like a normal image link.
-                    // This avoids needing a separate file-upload server: the
-                    // whole image is just stored as text in the database.
-                    // Keep photos modest in size (a few hundred KB) since a
-                    // very large image makes this text very long.
-                    const reader = new FileReader();
-                    reader.onload = () => setForm({ ...form, about: { ...form.about, avatarUrl: reader.result } });
-                    reader.readAsDataURL(file);
+                    // The photo is shrunk in your browser first (so it's tiny
+                    // and loads fast), then uploaded to its own storage — the
+                    // site content only keeps a short link to it. The new
+                    // photo is saved on the server straight away.
+                    setUploading(true);
+                    try {
+                      const url = await uploadImage(token, file);
+                      setForm((f) => ({ ...f, about: { ...f.about, avatarUrl: url } }));
+                      setStatus("Photo uploaded — click Save changes");
+                    } catch (err) {
+                      if (err.message === "SESSION_EXPIRED") { logout(); navigate("/admin/login"); return; }
+                      setStatus(err.message);
+                    } finally {
+                      setUploading(false);
+                    }
                   }}
                   className="text-[0.85rem]"
                 />
+                {uploading && <span className="text-[0.8rem]" style={{ color: "var(--muted)" }}>Uploading…</span>}
               </div>
             </Field>
             <Field label="...or an image URL (leave blank to show initials instead)">
               <Input
                 placeholder="https://..."
-                value={form.about.avatarUrl?.startsWith("data:") ? "" : form.about.avatarUrl || ""}
+                value={form.about.avatarUrl?.startsWith("/api/") ? "" : form.about.avatarUrl || ""}
                 onChange={(e) => setForm({ ...form, about: { ...form.about, avatarUrl: e.target.value } })}
               />
               {form.about.avatarUrl && (
@@ -434,6 +444,24 @@ export default function AdminContent() {
                     </select>
                   </div>
 
+                  {/* Show this section as a completely separate page (own URL + nav link) */}
+                  <label className="flex flex-wrap items-center gap-3 text-[0.88rem]">
+                    <span className="flex items-center gap-2">
+                      <input type="checkbox" checked={!!s.separatePage} onChange={(e) => setSection({ separatePage: e.target.checked })} />
+                      Show on its own page (not on the homepage)
+                    </span>
+                    {s.separatePage && (
+                      <span className="flex items-center gap-1.5">
+                        <span style={{ color: "var(--faint)" }}>yoursite.com/</span>
+                        <Input
+                          placeholder={slugify(s.title) || "research"}
+                          value={s.slug || ""}
+                          onChange={(e) => setSection({ slug: slugify(e.target.value) })}
+                        />
+                      </span>
+                    )}
+                  </label>
+
                   {s.layout !== "text" && (
                     <TextArea placeholder="Optional intro text shown above the items" value={s.body} onChange={(e) => setSection({ body: e.target.value })} />
                   )}
@@ -494,7 +522,7 @@ export default function AdminContent() {
               onClick={() =>
                 setForm({
                   ...form,
-                  extraSections: [...form.extraSections, { id: uid(), title: "", layout: "text", body: "", bullets: [], items: [] }],
+                  extraSections: [...form.extraSections, { id: uid(), title: "", layout: "text", slug: "", separatePage: false, body: "", bullets: [], items: [] }],
                 })
               }
             >
